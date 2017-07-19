@@ -142,6 +142,7 @@ class mavfile(object):
         self.idle_hooks = []
         self.uptime = 0.0
         self.notimestamps = notimestamps
+        self.timestamps_endian = '>'
         self._timestamp = None
         self.ground_pressure = None
         self.ground_temperature = None
@@ -1107,9 +1108,10 @@ class mavlogfile(mavfile):
             self._link = 0
         else:
             tbuf = self.f.read(8)
+            
             if len(tbuf) != 8:
                 return
-            (tusec,) = struct.unpack('>Q', tbuf)
+            (tusec,) = struct.unpack(self.timestamps_endian+'Q', tbuf)
             t = tusec * 1.0e-6
             if (self._last_timestamp is not None and
                 self._last_message.get_type() == "BAD_DATA" and
